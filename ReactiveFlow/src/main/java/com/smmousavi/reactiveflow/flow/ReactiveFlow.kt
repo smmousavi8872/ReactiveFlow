@@ -60,7 +60,7 @@ class CompositeEventJob {
         compositeJobs.add(job)
     }
 
-    fun cancelEvents() {
+    fun cancelAll() {
         for (job in compositeJobs) {
             job.cancelEvent()
         }

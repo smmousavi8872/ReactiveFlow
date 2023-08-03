@@ -33,10 +33,22 @@ class MainActivity : ComponentActivity() {
                     ) {
                         //onNextClick
                         val eventKey = when {
-                            viewModel.hotRadioSelected.value -> publishHotEvent()
-                            viewModel.coldRadioSelected.value -> publishColdEvent()
-                            else -> publishHotEvent()
+                            viewModel.hotRadioSelected.value -> {
+                                viewModel.publishHotEvent()
+                                MainActivityLayout.HOT_EVENT_RADIO_BUTTON_KEY
+                            }
+
+                            viewModel.coldRadioSelected.value -> {
+                                viewModel.publishColdEvent()
+                                MainActivityLayout.COLD_EVENT_RADIO_BUTTON_KEY
+                            }
+
+                            else -> {
+                                viewModel.publishHotEvent()
+                                MainActivityLayout.HOT_EVENT_RADIO_BUTTON_KEY
+                            }
                         }
+
                         startActivity(ResultActivity.newIntent(this, eventKey))
                     }
                 }
@@ -44,13 +56,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun publishHotEvent(): Int {
-        viewModel.reactiveFlow.publishHotEvent(MessageHotEvent(viewModel.messageEditTextInput.value))
-        return MainActivityLayout.HOT_EVENT_RADIO_BUTTON_KEY
-    }
-
-    private fun publishColdEvent(): Int {
-        viewModel.reactiveFlow.publishColdEvent(MessageColdEvent(viewModel.messageEditTextInput.value))
-        return MainActivityLayout.COLD_EVENT_RADIO_BUTTON_KEY
-    }
 }
