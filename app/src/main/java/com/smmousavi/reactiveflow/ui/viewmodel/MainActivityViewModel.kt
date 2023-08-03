@@ -31,13 +31,15 @@ class MainActivityViewModel @Inject constructor(
     // when you want to cancel each event independently
     private var messageHotEventJob: Job? = null
     private var messageColdEventJob: Job? = null
+    private var onceObservableEvent = MessageColdEvent(messageEditTextInput.value)
 
     fun publishHotEvent() {
         reactiveFlow.publishHotEvent(MessageHotEvent(messageEditTextInput.value))
     }
 
     fun publishColdEvent() {
-        reactiveFlow.publishColdEvent(MessageColdEvent(messageEditTextInput.value))
+        onceObservableEvent.message = messageEditTextInput.value
+        reactiveFlow.publishColdEvent(onceObservableEvent)
     }
 
     fun subscribeMessageHotEvent(
@@ -49,10 +51,10 @@ class MainActivityViewModel @Inject constructor(
         onSubscribe: (MessageHotEvent) -> Unit,
     ) {
         messageHotEventJob = reactiveFlow.onHotEvent(MessageHotEvent::class.java)
-            .subscribeOn(subscribeThread)
-            .observeOn(observeThread)
+            .publishOn(subscribeThread)
+            .subscribeOn(observeThread)
             .onException { e -> exception(e) }
-            .observeOnce(observeOnce)
+            .subscribeOnce(observeOnce)
             .withDelay(millis = delay)
             .subscribe {
                 onSubscribe(it)
@@ -68,10 +70,10 @@ class MainActivityViewModel @Inject constructor(
         onSubscribe: (MessageColdEvent) -> Unit,
     ) {
         messageColdEventJob = reactiveFlow.onColdEvent(MessageColdEvent::class.java)
-            .subscribeOn(subscribeThread)
-            .observeOn(observeThread)
+            .publishOn(subscribeThread)
+            .subscribeOn(observeThread)
             .onException { e -> exception(e) }
-            .observeOnce(observeOnce)
+            .subscribeOnce(observeOnce)
             .withDelay(millis = delay)
             .subscribe {
                 onSubscribe(it)

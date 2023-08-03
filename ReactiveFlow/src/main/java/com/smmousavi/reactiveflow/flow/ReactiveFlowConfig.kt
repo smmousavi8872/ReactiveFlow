@@ -5,17 +5,19 @@ import kotlinx.coroutines.Dispatchers
 
 data class ReactiveFlowConfig<T : EventFlow>(
 
-    var eventClass: Class<T>,
+    internal var eventClass: Class<T>,
 
-    var subscribeOn: CoroutineDispatcher = Dispatchers.IO,
+    internal var subscribeOn: CoroutineDispatcher = Dispatchers.IO,
 
-    var observeOn: CoroutineDispatcher = Dispatchers.Main,
+    internal var observeOn: CoroutineDispatcher = Dispatchers.Main,
 
-    var onException: (e: Exception) -> Unit = { e -> e.printStackTrace() },
+    internal var onException: (e: Exception) -> Unit = { e -> e.printStackTrace() },
 
-    var asHot: Boolean = false,
+    internal var asHot: Boolean = false,
 
-    var observeOnce: Boolean = false,
+    internal var publishOnce: Boolean = false,
 
-    var delayMillis: Long = 0,
+    internal var subscribeOnce: Boolean = false,
+
+    internal var delayMillis: Long = 0,
 )

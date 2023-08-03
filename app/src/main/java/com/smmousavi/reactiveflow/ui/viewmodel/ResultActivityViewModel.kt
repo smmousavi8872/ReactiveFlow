@@ -40,10 +40,11 @@ class ResultActivityViewModel @Inject constructor(
         onSubscribe: (MessageHotEvent) -> Unit,
     ) {
         messageHotEventJob = reactiveFlow.onHotEvent(MessageHotEvent::class.java)
-            .subscribeOn(subscribeThread)
-            .observeOn(observeThread)
+            .publishOn(subscribeThread)
+            .subscribeOn(observeThread)
             .onException { e -> exception(e) }
-            .observeOnce(observeOnce)
+            .publishOnce(true)
+            .subscribeOnce(observeOnce)
             .withDelay(millis = delay)
             .subscribe {
                 onSubscribe(it)
@@ -59,10 +60,10 @@ class ResultActivityViewModel @Inject constructor(
         onSubscribe: (MessageColdEvent) -> Unit,
     ) {
         messageColdEventJob = reactiveFlow.onColdEvent(MessageColdEvent::class.java)
-            .subscribeOn(subscribeThread)
-            .observeOn(observeThread)
+            .publishOn(subscribeThread)
+            .subscribeOn(observeThread)
             .onException { e -> exception(e) }
-            .observeOnce(observeOnce)
+            .subscribeOnce(observeOnce)
             .withDelay(millis = delay)
             .subscribe {
                 onSubscribe(it)

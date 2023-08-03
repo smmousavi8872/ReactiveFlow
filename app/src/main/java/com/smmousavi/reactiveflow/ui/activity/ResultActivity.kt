@@ -29,7 +29,9 @@ class ResultActivity : ComponentActivity() {
         getExtras()
 
         when (eventType) {
-            MainActivityLayout.HOT_EVENT_RADIO_BUTTON_KEY -> viewModel.subscribeMessageHotEvent { event ->
+            MainActivityLayout.HOT_EVENT_RADIO_BUTTON_KEY -> viewModel.subscribeMessageHotEvent(
+                delay = 2000
+            ) { event ->
                 viewModel.eventMessage.value = event.message
             }
 
