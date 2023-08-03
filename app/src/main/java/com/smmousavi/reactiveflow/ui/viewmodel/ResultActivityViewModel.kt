@@ -1,4 +1,4 @@
-package com.smmousavi.reactiveflow.ui.activity
+package com.smmousavi.reactiveflow.ui.viewmodel
 
 import android.app.Application
 import androidx.compose.runtime.mutableStateOf
@@ -13,6 +13,7 @@ class ResultActivityViewModel @Inject constructor(
     val reactiveFlow: ReactiveFlow,
 ) : AndroidViewModel(application) {
 
+    // view states
     var eventMessage = mutableStateOf("Waiting to receive your event...")
 
 }

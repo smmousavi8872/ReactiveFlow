@@ -15,6 +15,7 @@ import com.smmousavi.reactiveflow.event.MessageHotEvent
 import com.smmousavi.reactiveflow.ui.layouts.MainActivityLayout
 import com.smmousavi.reactiveflow.ui.layouts.ResultActivityLayout
 import com.smmousavi.reactiveflow.ui.theme.ReactiveFlowTheme
+import com.smmousavi.reactiveflow.ui.viewmodel.ResultActivityViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers

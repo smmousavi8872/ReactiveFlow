@@ -12,6 +12,7 @@ import com.smmousavi.reactiveflow.event.MessageColdEvent
 import com.smmousavi.reactiveflow.event.MessageHotEvent
 import com.smmousavi.reactiveflow.ui.layouts.MainActivityLayout
 import com.smmousavi.reactiveflow.ui.theme.ReactiveFlowTheme
+import com.smmousavi.reactiveflow.ui.viewmodel.MainActivityViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

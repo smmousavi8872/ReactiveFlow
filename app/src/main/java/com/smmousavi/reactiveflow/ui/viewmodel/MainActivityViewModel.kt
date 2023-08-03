@@ -1,4 +1,4 @@
-package com.smmousavi.reactiveflow.ui.activity
+package com.smmousavi.reactiveflow.ui.viewmodel
 
 import android.app.Application
 import androidx.compose.runtime.mutableStateOf

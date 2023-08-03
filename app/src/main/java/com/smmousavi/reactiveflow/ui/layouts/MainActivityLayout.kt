@@ -33,7 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.smmousavi.reactiveflow.R
-import com.smmousavi.reactiveflow.ui.activity.MainActivityViewModel
+import com.smmousavi.reactiveflow.ui.viewmodel.MainActivityViewModel
 
 class MainActivityLayout {
 
