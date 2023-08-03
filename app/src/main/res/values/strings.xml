@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">ReactiveFlow</string>
+    <string name="event_flow_hint">Event Message</string>
+    <string name="send_cold_event">Send cold event</string>
+    <string name="send_hot_event">Send hot event</string>
+    <string name="event_message_hint">Fill in your Event message:</string>
 </resources>
