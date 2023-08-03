@@ -1,6 +1,7 @@
 package com.smmousavi.reactiveflow.ui.activity
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -8,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.smmousavi.reactiveflow.event.MessageColdEvent
-import com.smmousavi.reactiveflow.event.MessageHotEvent
 import com.smmousavi.reactiveflow.ui.layouts.MainActivityLayout
 import com.smmousavi.reactiveflow.ui.theme.ReactiveFlowTheme
 import com.smmousavi.reactiveflow.ui.viewmodel.MainActivityViewModel
@@ -22,6 +21,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // subscribe to a cold event before publishing it
+        viewModel.subscribeMessageColdEvent() {
+            Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+        }
+
         setContent {
             ReactiveFlowTheme {
                 Surface(
@@ -32,28 +37,33 @@ class MainActivity : ComponentActivity() {
                         viewModel = viewModel,
                     ) {
                         //onNextClick
-                        val eventKey = when {
+                        when {
                             viewModel.hotRadioSelected.value -> {
                                 viewModel.publishHotEvent()
-                                MainActivityLayout.HOT_EVENT_RADIO_BUTTON_KEY
+                                startResultActivity()
                             }
 
                             viewModel.coldRadioSelected.value -> {
                                 viewModel.publishColdEvent()
-                                MainActivityLayout.COLD_EVENT_RADIO_BUTTON_KEY
                             }
 
                             else -> {
                                 viewModel.publishHotEvent()
-                                MainActivityLayout.HOT_EVENT_RADIO_BUTTON_KEY
+                                startResultActivity()
+
                             }
                         }
-
-                        startActivity(ResultActivity.newIntent(this, eventKey))
                     }
                 }
             }
         }
     }
+
+    private fun startResultActivity() = startActivity(
+        ResultActivity.newIntent(
+            this,
+            MainActivityLayout.HOT_EVENT_RADIO_BUTTON_KEY
+        )
+    )
 
 }

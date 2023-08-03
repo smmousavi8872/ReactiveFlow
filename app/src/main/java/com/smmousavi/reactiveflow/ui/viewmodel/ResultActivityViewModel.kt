@@ -9,7 +9,6 @@ import com.smmousavi.reactiveflow.flow.CompositeEventJob
 import com.smmousavi.reactiveflow.flow.ReactiveFlow
 import com.smmousavi.reactiveflow.flow.cancelEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -17,14 +16,13 @@ import java.lang.Exception
 import javax.inject.Inject
 
 @HiltViewModel
-@ViewModelScoped
 class ResultActivityViewModel @Inject constructor(
     application: Application,
     private val reactiveFlow: ReactiveFlow,
 ) : AndroidViewModel(application) {
 
     // view states
-    var eventMessage = mutableStateOf("Waiting to receive your event...")
+    var eventMessage = mutableStateOf("Waiting to receive your hot event...")
 
     // when you want to cancel all events observations at the same time
     private var compositeEventJob = CompositeEventJob()
