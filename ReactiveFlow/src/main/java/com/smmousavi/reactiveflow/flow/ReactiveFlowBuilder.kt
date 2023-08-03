@@ -12,7 +12,9 @@ interface ReactiveFlowBuilder<T : EventFlow> {
 
     fun onException(onException: (e: Exception) -> Unit): ReactiveFlowBuilderImpel<T>
 
-    fun observeOnce(): ReactiveFlowBuilderImpel<T>
+    fun observeOnce(observeOnce: Boolean): ReactiveFlowBuilderImpel<T>
+
+    fun withDelay(millis: Long): ReactiveFlowBuilderImpel<T>
 
     fun subscribe(eventAction: (T) -> Unit): Job
 }

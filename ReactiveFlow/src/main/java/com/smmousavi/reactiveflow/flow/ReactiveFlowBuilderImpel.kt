@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class ReactiveFlowBuilderImpel<T : EventFlow> @Inject constructor(
     private val reactiveFlow: ReactiveFlow,
-    private val configuration: ReactiveFlowConfig<T>
+    private val configuration: ReactiveFlowConfig<T>,
 ) : ReactiveFlowBuilder<T> {
 
     override fun subscribeOn(dispatcher: CoroutineDispatcher): ReactiveFlowBuilderImpel<T> {
@@ -25,8 +25,13 @@ class ReactiveFlowBuilderImpel<T : EventFlow> @Inject constructor(
         return this
     }
 
-    override fun observeOnce(): ReactiveFlowBuilderImpel<T> {
-        configuration.observeOnce = true
+    override fun observeOnce(observeOnce: Boolean): ReactiveFlowBuilderImpel<T> {
+        configuration.observeOnce = observeOnce
+        return this
+    }
+
+    override fun withDelay(millis: Long): ReactiveFlowBuilderImpel<T> {
+        configuration.delayMillis = millis
         return this
     }
 
@@ -41,9 +46,7 @@ class ReactiveFlowBuilderImpel<T : EventFlow> @Inject constructor(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private suspend fun <T : HotEventFlow> subscribeHot(
-        eventAction: (T) -> Unit
-    ): Job {
+    private suspend fun <T : HotEventFlow> subscribeHot(eventAction: (T) -> Unit): Job {
         return CoroutineScope(configuration.subscribeOn + SupervisorJob()).launch {
             reactiveFlow.hotEvents.asSharedFlow()
                 .filter { it.first.javaClass == configuration.eventClass }
@@ -53,6 +56,8 @@ class ReactiveFlowBuilderImpel<T : EventFlow> @Inject constructor(
                     val event = it.first as T
                     val fireWrapper = it.second
                     var mainJob: Job? = null
+
+                    if (configuration.delayMillis > 0) delay(configuration.delayMillis)
 
                     if (configuration.observeOnce) {
                         if (fireWrapper.fired.not()) {
@@ -73,9 +78,7 @@ class ReactiveFlowBuilderImpel<T : EventFlow> @Inject constructor(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private suspend fun <T : ColdEventFlow> subscribeCold(
-        eventAction: (T) -> Unit
-    ): Job {
+    private suspend fun <T : ColdEventFlow> subscribeCold(eventAction: (T) -> Unit): Job {
         return CoroutineScope(configuration.subscribeOn + SupervisorJob()).launch {
             reactiveFlow.coldEvents.asSharedFlow()
                 .filter { it.first.javaClass == configuration.eventClass }
@@ -85,6 +88,8 @@ class ReactiveFlowBuilderImpel<T : EventFlow> @Inject constructor(
                     val event = it.first as T
                     val fireWrapper = it.second
                     var mainJob: Job? = null
+
+                    if (configuration.delayMillis > 0) delay(configuration.delayMillis)
 
                     if (configuration.observeOnce) {
                         if (fireWrapper.fired.not()) {
@@ -103,6 +108,5 @@ class ReactiveFlowBuilderImpel<T : EventFlow> @Inject constructor(
                 }
         }
     }
-
 }
 

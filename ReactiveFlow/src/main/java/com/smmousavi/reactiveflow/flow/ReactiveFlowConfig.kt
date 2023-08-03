@@ -16,4 +16,6 @@ data class ReactiveFlowConfig<T : EventFlow>(
     var asHot: Boolean = false,
 
     var observeOnce: Boolean = false,
+
+    var delayMillis: Long = 0,
 )
