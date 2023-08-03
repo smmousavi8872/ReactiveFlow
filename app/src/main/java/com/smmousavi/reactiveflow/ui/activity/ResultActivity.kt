@@ -10,15 +10,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.smmousavi.reactiveflow.event.MessageColdEvent
-import com.smmousavi.reactiveflow.event.MessageHotEvent
 import com.smmousavi.reactiveflow.ui.layouts.MainActivityLayout
 import com.smmousavi.reactiveflow.ui.layouts.ResultActivityLayout
 import com.smmousavi.reactiveflow.ui.theme.ReactiveFlowTheme
+import com.smmousavi.reactiveflow.ui.viewmodel.ResultActivityViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import java.lang.Exception
 
 @AndroidEntryPoint
 class ResultActivity : ComponentActivity() {
@@ -30,11 +26,18 @@ class ResultActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setEventTypeExtra()
+        getExtras()
 
         when (eventType) {
-            MainActivityLayout.HOT_EVENT_RADIO_BUTTON_KEY -> subscribeHotEvent()
-            MainActivityLayout.COLD_EVENT_RADIO_BUTTON_KEY -> subscribeColdEvent()
+            MainActivityLayout.HOT_EVENT_RADIO_BUTTON_KEY -> viewModel.subscribeMessageHotEvent(
+                delay = 2000
+            ) { event ->
+                viewModel.eventMessage.value = event.message
+            }
+
+            MainActivityLayout.COLD_EVENT_RADIO_BUTTON_KEY -> viewModel.subscribeMessageColdEvent { event ->
+                viewModel.eventMessage.value = event.message
+            }
         }
 
         setContent {
@@ -49,43 +52,8 @@ class ResultActivity : ComponentActivity() {
         }
     }
 
-    private fun subscribeHotEvent(
-        subscribeThread: CoroutineDispatcher = Dispatchers.IO,
-        observeThread: CoroutineDispatcher = Dispatchers.Main,
-        exception: (Exception) -> Unit = { e -> e.printStackTrace() },
-        observeOnce: Boolean = false,
-        delay: Long = 0,
-    ) {
-        viewModel.reactiveFlow.onHotEvent(MessageHotEvent::class.java)
-            .subscribeOn(subscribeThread)
-            .observeOn(observeThread)
-            .onException { e -> exception(e) }
-            .observeOnce(observeOnce)
-            .withDelay(millis = delay)
-            .subscribe {
-                viewModel.eventMessage.value = it.message
-            }
-    }
 
-    private fun subscribeColdEvent(
-        subscribeThread: CoroutineDispatcher = Dispatchers.IO,
-        observeThread: CoroutineDispatcher = Dispatchers.Main,
-        exception: (Exception) -> Unit = { e -> e.printStackTrace() },
-        observeOnce: Boolean = false,
-        delay: Long = 0,
-    ) {
-        viewModel.reactiveFlow.onColdEvent(MessageColdEvent::class.java)
-            .subscribeOn(subscribeThread)
-            .observeOn(observeThread)
-            .onException { e -> exception(e) }
-            .observeOnce(observeOnce)
-            .withDelay(millis = delay)
-            .subscribe {
-                viewModel.eventMessage.value = it.message
-            }
-    }
-
-    private fun setEventTypeExtra() {
+    private fun getExtras() {
         _eventType = intent.extras?.takeIf { it.containsKey(EXTRA_RADIO_BUTTON_ID_KEY) }
             ?.getInt(EXTRA_RADIO_BUTTON_ID_KEY)
     }

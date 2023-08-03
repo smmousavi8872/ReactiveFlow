@@ -10,12 +10,12 @@ class ReactiveFlowBuilderImpel<T : EventFlow> @Inject constructor(
     private val configuration: ReactiveFlowConfig<T>,
 ) : ReactiveFlowBuilder<T> {
 
-    override fun subscribeOn(dispatcher: CoroutineDispatcher): ReactiveFlowBuilderImpel<T> {
+    override fun publishOn(dispatcher: CoroutineDispatcher): ReactiveFlowBuilderImpel<T> {
         configuration.subscribeOn = dispatcher
         return this
     }
 
-    override fun observeOn(dispatcher: CoroutineDispatcher): ReactiveFlowBuilderImpel<T> {
+    override fun subscribeOn(dispatcher: CoroutineDispatcher): ReactiveFlowBuilderImpel<T> {
         configuration.observeOn = dispatcher
         return this
     }
@@ -25,8 +25,13 @@ class ReactiveFlowBuilderImpel<T : EventFlow> @Inject constructor(
         return this
     }
 
-    override fun observeOnce(observeOnce: Boolean): ReactiveFlowBuilderImpel<T> {
-        configuration.observeOnce = observeOnce
+    override fun publishOnce(onceOnly: Boolean): ReactiveFlowBuilderImpel<T> {
+        configuration.publishOnce = onceOnly
+        return this
+    }
+
+    override fun subscribeOnce(onceOnly: Boolean): ReactiveFlowBuilderImpel<T> {
+        configuration.subscribeOnce = onceOnly
         return this
     }
 
@@ -35,78 +40,87 @@ class ReactiveFlowBuilderImpel<T : EventFlow> @Inject constructor(
         return this
     }
 
-    override fun subscribe(eventAction: (T) -> Unit): Job {
+    override fun subscribe(onSubscribe: (T) -> Unit): Job {
         return runBlocking {
             if (configuration.asHot) {
-                subscribeHot(eventAction)
+                subscribeHot(onSubscribe)
             } else {
-                subscribeCold(eventAction)
+                subscribeCold(onSubscribe)
             }
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    private suspend fun <T : HotEventFlow> subscribeHot(eventAction: (T) -> Unit): Job {
+    private suspend inline fun <reified T : HotEventFlow> subscribeHot(crossinline onSubscribe: (T) -> Unit): Job {
         return CoroutineScope(configuration.subscribeOn + SupervisorJob()).launch {
             reactiveFlow.hotEvents.asSharedFlow()
-                .filter { it.first.javaClass == configuration.eventClass }
+                .filter { it.javaClass == configuration.eventClass }
                 .catch { configuration.onException }
                 .cancellable()
-                .collectLatest {
-                    val event = it.first as T
-                    val fireWrapper = it.second
+                .collectLatest { event: HotEventFlow ->
+                    event as T
                     var mainJob: Job? = null
 
-                    if (configuration.delayMillis > 0) delay(configuration.delayMillis)
+                    // handle delayed subscription
+                    if (configuration.delayMillis > 0) {
+                        delay(configuration.delayMillis)
+                    }
 
-                    if (configuration.observeOnce) {
-                        if (fireWrapper.fired.not()) {
+                    // handle observe once state
+                    if (configuration.subscribeOnce) {
+                        if (event.fired.not()) {
                             mainJob = CoroutineScope(configuration.observeOn).launch {
-                                eventAction(event)
+                                onSubscribe(event)
                             }
-                            fireWrapper.fired = true
                         }
                     } else {
                         mainJob = CoroutineScope(configuration.observeOn).launch {
-                            eventAction(event)
+                            onSubscribe(event)
                         }
                     }
+                    event.fired = true
                     mainJob?.join()
                     mainJob?.cancel()
                 }
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    private suspend fun <T : ColdEventFlow> subscribeCold(eventAction: (T) -> Unit): Job {
+    private suspend inline fun <reified T : ColdEventFlow> subscribeCold(crossinline onSubscribe: (T) -> Unit): Job {
         return CoroutineScope(configuration.subscribeOn + SupervisorJob()).launch {
             reactiveFlow.coldEvents.asSharedFlow()
-                .filter { it.first.javaClass == configuration.eventClass }
+                .filter { it.javaClass == configuration.eventClass }
                 .catch { configuration.onException }
                 .cancellable()
-                .collectLatest {
-                    val event = it.first as T
-                    val fireWrapper = it.second
+                .collectLatest { event ->
+                    event as T
                     var mainJob: Job? = null
 
-                    if (configuration.delayMillis > 0) delay(configuration.delayMillis)
+                    // handle delayed subscription
+                    if (configuration.delayMillis > 0) {
+                        delay(configuration.delayMillis)
+                    }
 
-                    if (configuration.observeOnce) {
-                        if (fireWrapper.fired.not()) {
+                    // handle observe once state
+                    if (configuration.subscribeOnce) {
+                        if (event.fired.not()) {
                             mainJob = CoroutineScope(configuration.observeOn).launch {
-                                eventAction(event)
+                                onSubscribe(event)
                             }
-                            fireWrapper.fired = true
                         }
                     } else {
                         mainJob = CoroutineScope(configuration.observeOn).launch {
-                            eventAction(event)
+                            onSubscribe(event)
                         }
                     }
+                    event.fired = true
                     mainJob?.join()
                     mainJob?.cancel()
                 }
         }
     }
+
+    private suspend fun EventFlow.hasPublishedOnce() =
+        reactiveFlow.hotEvents.toList(mutableListOf(this))
+            .map { event -> event.javaClass }
+            .contains(this.javaClass)
 }
 

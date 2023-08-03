@@ -12,10 +12,10 @@ import javax.inject.Singleton
 class ReactiveFlow @Inject constructor() : ReactiveFlowInterface {
 
     // receives only the events which are fired after observing
-    internal val coldEvents = MutableSharedFlow<Pair<ColdEventFlow, FireWrapper>>()
+    internal val coldEvents = MutableSharedFlow<ColdEventFlow>()
 
     // receives the most recent fired event, even when observing after event was fired
-    internal val hotEvents = MutableSharedFlow<Pair<HotEventFlow, FireWrapper>>(replay = 1)
+    internal val hotEvents = MutableSharedFlow<HotEventFlow>(replay = 1)
 
     override fun <T : ColdEventFlow> onColdEvent(eventClass: Class<T>): ReactiveFlowBuilderImpel<T> {
         return ReactiveFlowBuilderImpel(this, ReactiveFlowConfig(eventClass, asHot = false))
@@ -27,13 +27,13 @@ class ReactiveFlow @Inject constructor() : ReactiveFlowInterface {
 
     override fun publishColdEvent(event: ColdEventFlow) {
         CoroutineScope(Dispatchers.IO).launch {
-            coldEvents.emit(Pair(event, FireWrapper(false)))
+            coldEvents.emit(event)
         }
     }
 
     override fun publishHotEvent(event: HotEventFlow) {
         CoroutineScope(Dispatchers.IO).launch {
-            hotEvents.emit(Pair(event, FireWrapper(false)))
+            hotEvents.emit(event)
         }
     }
 
@@ -44,13 +44,11 @@ class ReactiveFlow @Inject constructor() : ReactiveFlowInterface {
 
 fun Job.cancelEvent() = this.cancel(null)
 
-internal data class FireWrapper(var fired: Boolean = false)
-
 interface EventFlow
 
-open class ColdEventFlow : EventFlow
+open class ColdEventFlow(internal var fired: Boolean = false) : EventFlow
 
-open class HotEventFlow : EventFlow
+open class HotEventFlow(internal var fired: Boolean = false) : EventFlow
 
 class CompositeEventJob {
 
@@ -60,7 +58,7 @@ class CompositeEventJob {
         compositeJobs.add(job)
     }
 
-    fun cancelEvents() {
+    fun cancelAll() {
         for (job in compositeJobs) {
             job.cancelEvent()
         }

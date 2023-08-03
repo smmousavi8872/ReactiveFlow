@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.smmousavi.reactiveflow.ui.activity.ResultActivityViewModel
+import com.smmousavi.reactiveflow.ui.viewmodel.ResultActivityViewModel
 
 class ResultActivityLayout {
 
