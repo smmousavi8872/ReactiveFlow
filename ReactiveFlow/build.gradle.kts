@@ -19,7 +19,7 @@ val sourcesJar = tasks.register("sourcesJar", Jar::class) {
     // this case, the input is all of our source code files.
     from(android.sourceSets["main"].java.getSourceFiles())
 
-    // archiveClassifier lets us specify that this is an auxilary file (in
+    // archiveClassifier lets us specify that this is an auxiliary file (in
     // addition to the main file we're producing, which is a .aar file). It
     // has the effect of adding -sources at the end of the filename.
     archiveClassifier.set("sources")
@@ -78,13 +78,11 @@ android {
     }
 }
 
-//apply(from = "${rootProject.projectDir}/publish-script.gradle")
-
 publishing {
     publications {
         afterEvaluate {
             create<MavenPublication>("maven") {
-                // Include all artifacts from the "release" component. This is the
+                // Include all artifacts from the "maven" component. This is the
                 // .aar file itself.
                 from(components["release"])
 
@@ -94,7 +92,7 @@ publishing {
 
                 groupId = "io.github.smmousavi8872.reactiveflow"
                 artifactId = "reactive-flow"
-                version = "1.0.1.5"
+                version = "1.0.1.6"
 
                 pom {
                     name.set("ReactiveFlow")
@@ -123,7 +121,6 @@ publishing {
                         developerConnection.set("scm:git@github.com:smmousavi8872/ReactiveFlow.git")
                         url.set("https://github.com/smmousavi8872/ReactiveFlow/tree/master")
                     }
-
                 }
             }
         }
@@ -180,5 +177,3 @@ dependencies {
 kapt {
     correctErrorTypes = true
 }
-
-
