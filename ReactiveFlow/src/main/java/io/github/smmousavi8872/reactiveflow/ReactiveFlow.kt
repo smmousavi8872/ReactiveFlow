@@ -5,8 +5,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ReactiveFlow : ReactiveFlowInterface {
+
+@Singleton
+class ReactiveFlow @Inject constructor() : ReactiveFlowInterface {
 
     // receives only the events which are fired after observing
     internal val coldEvents = MutableSharedFlow<ColdEventFlow>()

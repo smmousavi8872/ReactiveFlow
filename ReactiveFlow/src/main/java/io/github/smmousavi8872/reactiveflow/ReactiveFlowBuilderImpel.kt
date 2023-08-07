@@ -3,8 +3,9 @@ package io.github.smmousavi8872.reactiveflow
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.lang.Exception
+import javax.inject.Inject
 
-class ReactiveFlowBuilderImpel<T : EventFlow> constructor(
+class ReactiveFlowBuilderImpel<T : EventFlow> @Inject constructor(
     private val reactiveFlow: ReactiveFlow,
     private val configuration: ReactiveFlowConfig<T>,
 ) : ReactiveFlowBuilder<T> {
