@@ -50,10 +50,10 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "io.github.smmousavi8872.reactiveflow"
             artifactId = "reactive-flow"
-            version = "1.0.1"
+            version = "1.0.1.1"
 
             pom {
-                name.set("reactive-flow")
+                name.set("ReactiveFlow")
                 packaging.plus("aar")
                 description.set("A library to mimic the behavior of Rx extension using coroutine SharedFlow")
                 url.set("https://github.com/smmousavi8872/ReactiveFlow")
