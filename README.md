@@ -8,14 +8,15 @@ All events are sent in the background thread by default though it can be customi
 # How to Install?
 Simply add the following line to the `dependencies` section of your `build.gradle` file:
 
-```
-  implementation 'io.github.smmousavi8872.reactiveflow:reactive-flow:1.0.1.6'
+```kotlin
+implementation 'io.github.smmousavi8872.reactiveflow:reactive-flow:1.0.1.6'
 ```
 
 # How to use?
 Take these four easy steps to get your `ReactiveFlow` working:
-1. **Inject** the `ReactiveFlow` object through `Hilt` or `Dagger` inside both classes in which you are going to publish and subscribe to your event.
-```
+1. **Inject** the `ReactiveFlow` object through `Hilt` or `Dagger` inside both classes in which you are going to publish and subscribe to your event.(It's already provided)
+
+```kotlin
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
     application: Application,
@@ -23,26 +24,29 @@ class MainActivityViewModel @Inject constructor(
 ) : AndroidViewModel(application = application) {
   ...
 }
+```
 
-```
 2. **Extend** your Event data class from `ColdEventFlow` or `HotEventFlow` according to your applications(I will explain their differences).
-```
+
+```kotlin
 data class MessageHotEvent(val id: Int = 0, var message: String) : HotEventFlow()
-``` 
 ```
+
+``` kotlin
 data class MessageColdEvent(val id: Int = 0, var message: String) : ColdEventFlow()
-``` 
-3. **Publish** your Event from the publisher class using the `ReactiveFlow` object.
 ```
+
+3. **Publish** your Event from the publisher class using the `ReactiveFlow` object.
+```kotlin
 // publish a hot event
 reactiveFlow.publishHotEvent(MessageHotEvent(message = messageEditTextInput.value))
 ```
-```
+```kotlin
 // publish a cold event
 reactiveFlow.publishColdEvent(MessageColdEvent(message = messageEditTextInput.value))
 ```
 4. **Subscribe** to your Event in the subscriber class using the `ReactiveFlow` object.
-```
+```kotlin
 private var messageHotEventJob: Job? = null
 
 ...
@@ -54,7 +58,7 @@ messageHotEventJob = reactiveFlow.onHotEvent(MessageHotEvent::class.java)
             }
 ```
 
-```
+```kotlin
 private var messageColdEventJob: Job? = null
 
 ...
@@ -70,3 +74,44 @@ messageColdEventJob = reactiveFlow.onColdEvent(MessageColdEvent::class.java)
 You can send two types of **Events** with different functionalities.<br/>
 * **ColdEvent**: These kinds of events are received only when the event is subscribed to before it is published, otherwise, no events would be received.<br/>
 * **HotEvent**: In despite of ColdEvents, HotEvents are received regardless of being subscribed before publishing or after it. In the case of being published before subscribing, the Event will be received as soon as it gets subscribed to.
+
+> **Note**
+**You can NOT use Hot and Cold events interchangeably!** <br/> Cold events should be published and subscribed to, using the methods taking `ColdEventFlow` subtypes, as well as Hot events which should be published and subscribed to using the the methods taking `HotEventFlow` subtypes.
+
+### How cancel subscription? ###
+When ever you subscribe to an Event, the `subscribe` methods returns a `Job?` object. This is the handle to withdraw an Event(Cold or Hot) subscription.
+
+```kotlin
+
+override fun onCleared() {
+        super.onCleared()
+        // cancel events independently
+        messageColdEventJob?.cancelEvent()
+    }
+
+```
+Also, there is a situation in which you are faced to the multiple number of Events in a same class which you are going to cancel them all at once. In this case you only need to instantiate a `CompositeEventJob` and add returing `Job` from each event subscribe method to the composit object using `+` operator function, and the end call `cancelAll()` over it. 
+
+```kotlin
+private val compositeEventJob = CompositeEventJob()
+
+...
+
+messageHotEventJob + reactiveFlow.onHotEvent(MessageHotEvent::class.java)
+            .subscribe { event ->
+                // do your hot subscription actions
+            }
+messageColdEventJob + reactiveFlow.onColdEvent(MessageColdEvent::class.java)
+            .subscribe { event ->
+               // do your cold subscription actions
+            }
+
+...
+
+override fun onCleared() {
+        super.onCleared()
+        // cancel events independently
+        messageColdEventJob?.cancelEvent()
+    }
+
+```
