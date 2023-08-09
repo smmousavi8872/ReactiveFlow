@@ -1,6 +1,8 @@
 # ReactiveFlow
-This is a reactive (publish/subscribe) event-based library to handle sending objects efficiently through the whole app based on `SharedFlow`. You can wrap any type of object into an `EventFlow` type and send them anywhere in your app(other classes, other packages, or even other modules) through a `ReactiveFlow` without needing any
-class instantiation.
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.smmousavi8872.reactiveflow/reactive-flow.svg?color=brightgreen)](https://search.maven.org/artifact/io.github.smmousavi8872.reactiveflow/reactive-flow)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+<br/>This is a reactive (publish/subscribe) event-based library to handle sending objects efficiently through the whole app based on `SharedFlow`. You can wrap any type of object into an `EventFlow` type and send them anywhere in your app(other classes, other packages, or even other modules) through a `ReactiveFlow` without needing any
+class instantiation.<br/>
 All events are sent in the background thread by default though it can be customized to use any other threads for publishing or subscribing to an Event.
 
 # How to Install? [![Maven Central](https://img.shields.io/maven-central/v/io.github.smmousavi8872.reactiveflow/reactive-flow.svg?color=brightgreen)](https://search.maven.org/artifact/io.github.smmousavi8872.reactiveflow/reactive-flow)
