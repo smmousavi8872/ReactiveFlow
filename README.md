@@ -12,7 +12,7 @@ Simply add the following line to the `dependencies` section of your `build.gradl
 implementation 'io.github.smmousavi8872.reactiveflow:reactive-flow:1.0.1.6'
 ```
 
-# How to use?
+# How to use it?
 Take these four easy steps to get your `ReactiveFlow` working:
 1. **Inject** the `ReactiveFlow` object through `Hilt` or `Dagger` inside both classes in which you are going to publish and subscribe to your event.(It's already provided)
 
@@ -70,7 +70,7 @@ messageColdEventJob = reactiveFlow.onColdEvent(MessageColdEvent::class.java)
             }
 ```
 
-### Cold or Hot?<br/>
+## Cold or Hot?<br/>
 You can send two types of **Events** with different functionalities.<br/>
 * **ColdEvent**: These kinds of events are received only when the event is subscribed to before it is published, otherwise, no events would be received.<br/>
 * **HotEvent**: In despite of ColdEvents, HotEvents are received regardless of being subscribed before publishing or after it. In the case of being published before subscribing, the Event will be received as soon as it gets subscribed to.
@@ -78,8 +78,8 @@ You can send two types of **Events** with different functionalities.<br/>
 > **Note**
 **You can NOT use Hot and Cold events interchangeably!** <br/> Cold events should be published and subscribed to, using the methods taking `ColdEventFlow` subtypes, as well as Hot events which should be published and subscribed to using the the methods taking `HotEventFlow` subtypes.
 
-### How cancel subscription? ###
-When ever you subscribe to an Event, the `subscribe` methods returns a `Job?` object. This is the handle to withdraw an Event(Cold or Hot) subscription.
+## How to cancel a subscription?
+Whenever you subscribe to an Event, the `subscribe` method returns a `Job?` object. This is the handle to withdraw an Event(Cold or Hot) subscription.
 
 ```kotlin
 
@@ -90,18 +90,18 @@ override fun onCleared() {
     }
 
 ```
-Also, there is a situation in which you are faced to the multiple number of Events in a same class which you are going to cancel them all at once. In this case you only need to instantiate a `CompositeEventJob` and add returing `Job` from each event subscribe method to the composit object using `+` operator function, and the end call `cancelAll()` over it. 
+Also, there is a situation in which you are faced with multiple number of Events in the same class and you are going to cancel them all at once. In this case, you only need to instantiate a `CompositeEventJob` and add returning `Job` from each event subscribe method to the composite object using `+` operator function, and at the end call `cancelAll()` over it. 
 
 ```kotlin
 private val compositeEventJob = CompositeEventJob()
 
 ...
 
-messageHotEventJob + reactiveFlow.onHotEvent(MessageHotEvent::class.java)
+compositeEventJob + reactiveFlow.onHotEvent(MessageHotEvent::class.java)
             .subscribe { event ->
                 // do your hot subscription actions
             }
-messageColdEventJob + reactiveFlow.onColdEvent(MessageColdEvent::class.java)
+compositeEventJob + reactiveFlow.onColdEvent(MessageColdEvent::class.java)
             .subscribe { event ->
                // do your cold subscription actions
             }
@@ -111,7 +111,21 @@ messageColdEventJob + reactiveFlow.onColdEvent(MessageColdEvent::class.java)
 override fun onCleared() {
         super.onCleared()
         // cancel events independently
-        messageColdEventJob?.cancelEvent()
+        compositeEventJob?.cancelAll()
     }
+
+```
+## A few things to Customize.
+So far so good, but what if you what to change the publisher or subscriber threads?</br>The good news is there are multiple chain methods to add before `subscribe` to handle different functionalities. The following section demonstrates a full example of all chain methods supported by `ReactiveFlow` that can be used to customize the implementation as you need:
+```kotlin
+messageColdEventJob = reactiveFlow.onColdEvent(MessageColdEvent::class.java)
+            .publishOn(Dispatchers.IO) // specify the publisher thread
+            .subscribeOn(Dispatchers.Main) // specify the subscriber thread
+            .onException { e -> e.printStacktrace() } // handle exception 
+            .subscribeOnce(true) // receive a specific event only once.
+            .withDelay(millis = 1000) // subscribe with given delay
+            .subscribe { event ->
+                onSubscribe(event)
+            }.also { compositeEventJob + it }
 
 ```
