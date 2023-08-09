@@ -13,7 +13,7 @@ Simply add the following line to the `dependencies` section of your `build.gradl
 ```
 
 # How to use?
-Take these three easy steps to get your `ReactiveFlow` working:
+Take these four easy steps to get your `ReactiveFlow` working:
 1. **Inject** the `ReactiveFlow` object through `Hilt` or `Dagger` inside both classes in which you are going to publish and subscribe to your event.
 ```
 @HiltViewModel
