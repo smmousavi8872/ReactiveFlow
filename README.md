@@ -68,5 +68,5 @@ messageColdEventJob = reactiveFlow.onColdEvent(MessageColdEvent::class.java)
 
 ### Cold or Hot?<br/>
 You can send two types of **Events** with different functionalities.<br/>
-**1. ColdEvent**: These kinds of events are received only when the event is subscribed to before it is published, otherwise, no events would be received.<br/>
-**1. HotEvent**: In despite of ColdEvents, HotEvents are received regardless of being subscribed before publishing or after it. In the case of being published before subscribing, the Event will be received as soon as it gets subscribed to.
+* **ColdEvent**: These kinds of events are received only when the event is subscribed to before it is published, otherwise, no events would be received.<br/>
+* **HotEvent**: In despite of ColdEvents, HotEvents are received regardless of being subscribed before publishing or after it. In the case of being published before subscribing, the Event will be received as soon as it gets subscribed to.
