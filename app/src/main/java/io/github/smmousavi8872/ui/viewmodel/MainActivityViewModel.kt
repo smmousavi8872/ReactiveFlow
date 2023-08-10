@@ -26,15 +26,15 @@ class MainActivityViewModel @Inject constructor(
     var messageEditTextInput = mutableStateOf("")
 
     // when you want to cancel all events observations at the same time
-    private var compositeEventJob = CompositeEventJob()
+    private val compositeEventJob = CompositeEventJob()
 
     // when you want to cancel each event independently
     private var messageHotEventJob: Job? = null
     private var messageColdEventJob: Job? = null
-    private var onceObservableEvent = MessageColdEvent(messageEditTextInput.value)
+    private var onceObservableEvent = MessageColdEvent(message = messageEditTextInput.value)
 
     fun publishHotEvent() {
-        reactiveFlow.publishHotEvent(MessageHotEvent(messageEditTextInput.value))
+        reactiveFlow.publishHotEvent(MessageHotEvent(message = messageEditTextInput.value))
     }
 
     fun publishColdEvent() {
