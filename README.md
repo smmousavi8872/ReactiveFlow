@@ -76,7 +76,7 @@ You can send two types of **Events** with different functionalities.<br/>
 * **HotEvent**: In despite of ColdEvents, HotEvents are received regardless of being subscribed before publishing or after it. In the case of being published before subscribing, the Event will be received as soon as it gets subscribed to.
 
 > **Note**
-**You can NOT use Hot and Cold events interchangeably!** <br/> Cold events should be published and subscribed to, using the methods taking `ColdEventFlow` subtypes, as well as Hot events which should be published and subscribed to using the the methods taking `HotEventFlow` subtypes.
+**You can NOT use Hot and Cold events interchangeably!** <br/> Cold events should be published and subscribed to, using the methods taking `ColdEventFlow` subtypes, as well as Hot events which should be published and subscribed to using the methods taking `HotEventFlow` subtypes.
 
 ## How to cancel a subscription?
 Whenever you subscribe to an Event, the `subscribe` method returns a `Job?` object. This is the handle to withdraw an Event(Cold or Hot) subscription.
