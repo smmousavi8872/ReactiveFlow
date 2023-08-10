@@ -14,5 +14,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "ReactiveFlow"
-include(":app")
+include(":sample")
 include(":ReactiveFlow")
